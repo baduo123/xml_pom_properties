@@ -1,0 +1,33 @@
+#端口号
+server:
+  port: 8001 
+#Spring的配置
+spring:
+  datasource:
+  #数据源
+    type: com.alibaba.druid.pool.DruidDataSource
+    #驱动
+    driver-class-name: com.mysql.jdbc.Driver
+    #数据库连接
+    url: jdbc:mysql://localhost:3306/woniuxy?characterEncoding=utf-8
+    #用户名
+    username: root
+    #密码
+    password: wyaonng6361
+    dbcp2:
+      min-idle: 5
+      initial-size: 5
+      max-total: 5
+      max-wait-millis: 200
+#    #模板引擎配置
+#    thymeleaf:
+#    #配置返回值前缀以及后缀
+#      prefix: classpath:/templates/
+#      suffix: .html
+#      mode: HTML5
+ #配置mybatis
+mybatis:
+#实体类包
+  type-aliases-package: com.woniuxy.springcloud.entities
+  #配置mapping路径
+  mapper-locations: classpath:mybatis/mapper/**/*.xml
