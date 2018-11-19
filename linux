@@ -1,0 +1,199 @@
+2018-10-08
+Linux
+1. 为什么学习
+(1)	开发效率很高，因Linux本身资源占用少（最少几百mb）,本身运行的程序少，大多数的硬件资源会直接作用于应用程序上.
+(2)	部署项目到Linux系统并运行 。
+2. 什么是Linux
+(1)	表示Linux系统核心。里面仅包含操作系统的基础部分(如 控制cpu  使用内存、读取文件).Linux系统核心加上应用软件才构成我们所使用的具体完整的Linux系统。
+(2)	指开源的操作系统
+3. Linux 发展
+4. Linux 和window区别、
+
+Linux环境安装
+1. 虚拟机：通过软件虚拟出来的完整的一台电脑
+2. 为什么要用虚拟机：
+(1)	我们可以在虚拟机里安装不同的操作系统来达到节约成本，同一台电脑使用不同操作系统的目的。避免不必要的消耗。
+
+Linux 常用目录
+1. 根目录： /   存放着Linux系统的所有文件
+2.  /bin : 存放的是所有用户都可以使用的Linux命令
+3. /etc:  保存的是系统的配置文件
+4. /dev:保存的是设备相关文件
+5. /home : 普通用户的主目录的父目录
+6. /root:  root用户的主目录
+7. /lost+found：
+8. /Mnt: 挂载临时的文件系统(u盘、移动硬盘)
+9. /sbin: 
+10. /tmp:
+11. /usr:
+12. /opt: (option) 专门存放个人文件或者大文件
+
+
+Linux用户管理
+①	添加用户: useradd [参数]  新增用户名
+②	-d:指定用户主目录位置
+③	删除用户: userdel [参数]  被删除用户名
+④	-f:强制删除用户,即使用户已登录
+⑤	-r:删除用户的主目录
+⑥	修改用户: 
+1)	-l :修改用户名  usermod -l 新用户名 旧用户名
+2)	Passwd 要设置或修改密码的用户名
+Linux 用户组管理
+1. 定义：用户组是Linux为了统一管理多个用户的 权限而设置的机制。同一个用户组的用户对某些文件具有一样的权限
+2. 主要的用户组(主组):Linux认为一个用户至少属于一个用户组，而Linux会在新建用户时创建一个跟用户名同名的用户组（默认的主组），并把该用户添加进去。一个用户只能属于一个主组，其他的属于附加用户组。
+3. 常规操作
+(1)	查看用户的所属用户组：groups  用户名
+(2)	添加用户组   groupadd 用户组名字
+(3)	删除用户组   groupdel 用户组名字
+(4)	修改用户组   groupmod 
+1)	 -n  修改用户组的名称  groupmod  -n 新用户组名称   旧 
+(5)	将某用户加入到某用户组中
+1)	Usermod -G  用户组1,用户组2    被添加的用户名
+(6)	将某用户踢出某用户组
+(7)	Usermod -G 主组 用户名
+练习：
+1. 新增两个用户组 dev  test 
+2. 往dev添加一个用户programmer1
+3. 往test添加一个用户tester1 
+4. 往dev,test添加一个用户projectmanager
+5. 把programmer1 踢出dev 
+6. Tester1 转为dev组
+
+Linux常用命令
+2. cd 进入某目录：
+(1)	~  :当前登录用户的主目录
+(2)	.. ：返回上一级目录
+3. ls: 查看当前目录有哪些文件
+(1)	-a
+(2)	-l
+4. Mkdir :创建空目录
+(1)	-p
+5. Ifconfig
+6. ping
+7. shutdown
+8. reboot:重启
+9. 显示当前登录用户：
+(1)	Whoami
+(2)	Who  am  i
+(3)	Who
+10. vi:编辑文件命令
+(1)	如果文件不存在，那么vi会自动创建并打开
+11. Cp 
+(1)	复制文件 ：cp 被复制文件  复制路径
+(2)	复制目录： cp -r/R 被复制文件夹  复制路径
+12. Mv 
+(1)	重命名  mv 文件名   新文件名
+(2)	移动   mv 文件名   移动路径  (以/开始的指从根目录开始)
+(3)	移动并重命名  mv文件名  移动路径/新文件名
+
+13. Rm
+(1)	-rf 
+14. Find
+(1)	通过名字查找
+1)	一般查找
+a.	Find 查找路径 -name  查找的文件名
+2)	模糊查找
+a.	Find 查找路径 -name  “模糊的文件名”
+b.	Find /  -name  “*.txt”
+(2)	通过类型查找
+1)	Find  查找路径  -type  类型 ( f :普通文件  d:目录  l:连接文件  )
+15. Wc
+(1)	-l
+16. Grep 
+(1)	Grep “要查找的字符串” 被查找的文件名
+17. Rmdir 
+18. More less 
+19. Ln 
+(1)	硬链接: 相当于源文件的备份（数据同步）
+1)	ln 具体文件名   快捷方式名称(路径)
+(2)	软连接（类似window下的快捷方式）: 源文件被删除，该链接文件失效
+1)	ln  -s 具体文件名   快捷方式名称(路径)
+20. Kill
+(1)	-9 强制杀死
+21. Alias 
+22. Clear
+23. Top
+24. 压缩命令
+(1)	压缩（打包）：tar -cvzf 压缩文件名.tar.gz  被压缩文件1 被压缩文件2 (* 代替当前目录所有文件)
+(2)	解压 ：tar -xvzf 解压文件名.tar.gz
+25. Linux管道  |
+(1)	查找/home/1.txt 中 hello出现的行数
+1)	grep  “hello” /home/1.txt | wc -l 
+(2)	查找所有的普通文件并分页显示
+1)	Find / -type f  | more 
+(3)	Ping 192.168.5.23 ping3次 显示ping通的次数
+1)	ping 192.168.5.23 -c 3  | grep "64 bytes " | wc -l
+(4)	查找Linux系统中目录的个数
+1)	Find / -type d |wc -l
+26. 重定向
+(1)	>> 追加
+(2)	> 覆盖
+(3)	例子
+1)	将Linux中的普通文件的个数追加到sys.log中
+a.	 Find / -type f | wc -l   >> sys.log
+
+
+
+2018-10-10
+1. Linux 安装部署
+(1)	目标：能够通过Windows下的浏览器访问Linux的ip地址来查看电商网站
+(2)	步骤：
+①	Linux下 安装java环境
+1)	Jdk
+②	Linux下安装服务器软件tomcat 
+③	安装mysql
+
+
+(3)	详细步骤
+①	Windows和Linux文件互传
+1)	在Linux下安装lrzsz 
+a.	yum install -y lrzsz
+②	安装java环境
+1)	把jdk压缩文件放入Linux中解压
+2)	把java命令改成全局命令
+a.	修改/root目录下的.bash_profile. 增加三行代码
+在 Path  和export 两行中间添加
+JAVA_HOME="/opt/jdk1.7.0_67"
+PATH=$PATH:$JAVA_HOME/bin
+CLASSPATH=$CLASSPATH:$JAVA_HOME/lib
+b.	激活修改的配置文件
+a)	Source .bash_profile
+
+③	安装TomCat
+1)	将Tomcat压缩文件放入Linux中并解压
+2)	将java项目打包成war包并拖放至Linux中的Tomcat中的webapps目录中
+a.	注意:java项目中jdbc 中数据库url要改为Linux的IP地址而不是localhost
+3)	启动Tomcat
+a.	在Tomcat目录下的bin目录 启动Tomcat
+a)	sh startup.sh
+b.	在Windows下的浏览器访问 http://Linux的ip地址:8080
+c.	注意：如果页面无法访问，可能是Linux防火墙禁止端口使用，
+a)	关闭防火墙: service iptables stop
+④	安装mysql
+1)	下载并安装mysql  mysql-server
+a.	Yum install -y mysql  mysql-server
+2)	启动mysql
+a.	service mysqld start
+3)	设置mysql管理员账号
+a.	Mysqladmin -uroot password “密码”
+a)	注意： 密码要和jdbc中使用的密码一致，不然jdbc无法访问数据库
+4)	进入mysql
+a.	mysql -u root -p
+5)	将数据库的sql文件导入到Linux中并在当前目录进入mysql
+6)	创建项目所使用的数据库(sql代码)
+a.	Create database 数据库名;
+7)	使用该数据库(sql代码)
+a.	Use 数据库名;
+8)	激活sql文件
+a.	Source xxx.sql;
+9)	注意：如果页面报500错误，可能是mysql不支持远程访问(sql代码)
+a.	grant all privileges  on *.* to 'root'@'%' identified by "root账号密码";
+解决乱码问题（数据库字符编码不对）：
+1. 进入/etc 修改 my.cnf 文件
+(1)	在最开头添加并修改以下代码:
+ 
+2. 重启mysql服务：
+(1)	Service mysqld restart
+3. 进入mysql，删除原来的数据库并重新创建数据库
+4. 利用source使用sql文件即可
+5. 可以利用 show global variables like “char%”; 来查看字符编码是否修改成功
