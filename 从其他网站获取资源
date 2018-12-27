@@ -1,0 +1,148 @@
+package com.honggv.cms.service;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.honggv.cms.constant.RadioConstant;
+import com.honggv.cms.pojo.RadioCateChannel;
+import com.honggv.cms.pojo.RadioCateData;
+import com.honggv.cms.pojo.RadioCateVO;
+import com.honggv.cms.pojo.RadioData;
+import com.honggv.cms.pojo.RadioPlace;
+import com.honggv.cms.pojo.RadioTop;
+import com.honggv.cms.security.FaildMessageException;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+/**
+ * Created with IDEA
+ * ProjectName: cms
+ * Date: 12/26/18 4:57 PM
+ * @author wzx
+ * @version 1.0
+ */
+@Service
+public class RadioService {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    /**
+     * 获取电台列表
+     * @param channelId 频道ID
+     * @param date 日期   格式 2018-09-10
+     * @return
+     */
+    public List<RadioData> list(String channelId, String date) throws IOException {
+        String json = redisTemplate.opsForValue().get(String.format(RadioConstant.RADIO_CN_FORMAT, channelId, date));
+        Gson gson = new Gson();
+        if (json == null) {
+            String radioJson = getData(String.format(RadioConstant.RADIO_CN_URL_FORMAT, channelId, date));
+            JsonObject jsonObject = gson.fromJson(radioJson, JsonObject.class);
+            if (jsonObject.get("result_code").getAsInt() != 0) {
+                throw new FaildMessageException(jsonObject.get("result_message").getAsString());
+            }
+            radioJson = jsonObject.getAsJsonObject("data").getAsJsonArray("program").getAsString();
+            List<RadioData> list = gson.fromJson(radioJson, new TypeToken<List<RadioData>>(){}.getType());
+            redisTemplate.opsForValue().set(String.format(RadioConstant.RADIO_CN_FORMAT, channelId, date), gson.toJson(list), 30, TimeUnit.MINUTES);
+            return list;
+        }
+        return gson.fromJson(json, new TypeToken<List<RadioData>>(){}.getType());
+    }
+
+    public List<RadioCateData> getCategoryList() throws  IOException{
+        String json = redisTemplate.opsForValue().get(RadioConstant.RADIO_CATEDATA_TYPE);
+        Gson gson = new Gson();
+        if (json == null){
+            String radioJson = getData(RadioConstant.RADIO_CATEDATA_TYPE_URL);
+            JsonObject jsonObject = gson.fromJson(radioJson, JsonObject.class);
+            if (jsonObject.get("result_code").getAsInt() != 0) {
+                throw new FaildMessageException(jsonObject.get("result_message").getAsString());
+            }
+            radioJson = jsonObject.getAsJsonObject("data").getAsJsonArray("category").toString() ;
+            List<RadioCateData>list = gson.fromJson(radioJson, new TypeToken<List<RadioCateData>>(){}.getType());
+            redisTemplate.opsForValue().set(RadioConstant.RADIO_CATEDATA_TYPE, gson.toJson(list) , 30, TimeUnit.MINUTES);
+            return list;
+        }
+        return  gson.fromJson(json, new TypeToken<List<RadioCateData>>(){}.getType());
+    }
+
+    public RadioCateVO getCateChannel(String pageNum, String categoryId)throws  IOException{
+        String json = redisTemplate.opsForValue().get(String.format(RadioConstant.RADIO_CATEDATA_FORMAT,pageNum,categoryId));
+        Gson gson = new Gson();
+        if (json == null){
+            String radioJson = getData(String.format(RadioConstant.RADIO_CATEDATA_URL_FORMAT, pageNum, categoryId));
+            JsonObject jsonObject = gson.fromJson(radioJson , JsonObject.class);
+            if (jsonObject.get("result_code").getAsInt() != 0) {
+                throw new FaildMessageException(jsonObject.get("result_message").getAsString());
+            }
+            radioJson = jsonObject.get("data").getAsJsonObject().toString();
+            RadioCateVO vo = gson.fromJson(radioJson, new TypeToken<RadioCateVO>(){}.getType());
+            redisTemplate.opsForValue().set(String.format(RadioConstant.RADIO_CATEDATA_FORMAT,pageNum,categoryId),
+                    gson.toJson(vo), 30, TimeUnit.MINUTES);
+            return vo;
+        }
+        return gson.fromJson(json, new TypeToken<RadioCateVO>(){}.getType());
+    }
+
+    public List<RadioPlace> getRadioPlace()throws  IOException{
+        String json = redisTemplate.opsForValue().get(RadioConstant.RADIO_PLACE);
+        Gson gson = new Gson();
+        if (json == null){
+            String radioJson = getData(RadioConstant.RADIO_PLACE_URL_FORMAT);
+            JsonObject jsonObject = gson.fromJson(radioJson , JsonObject.class);
+            if (jsonObject.get("result_code").getAsInt() != 0) {
+                throw new FaildMessageException(jsonObject.get("result_message").getAsString());
+            }
+            radioJson = jsonObject.get("data").getAsJsonObject().get("place").getAsJsonArray().toString();
+            List<RadioPlace>list = gson.fromJson(radioJson, new TypeToken<List<RadioPlace>>(){}.getType());
+            redisTemplate.opsForValue().set(RadioConstant.RADIO_PLACE, gson.toJson(list), 30, TimeUnit.MINUTES);
+            return list;
+        }
+        return gson.fromJson(json, new TypeToken<RadioCateVO>(){}.getType());
+    }
+
+    public List<RadioTop> getRadioTop(String placeId)throws  IOException{
+        String json = redisTemplate.opsForValue().get(String.format(RadioConstant.RADIO_TOP_FORMAT,placeId));
+        Gson gson = new Gson();
+        if (json == null){
+            String radioJson = getData(String.format(RadioConstant.RADIO_PLACE_URL_FORMAT,placeId));
+            JsonObject jsonObject = gson.fromJson(radioJson , JsonObject.class);
+            if (jsonObject.get("result_code").getAsInt() != 0) {
+                throw new FaildMessageException(jsonObject.get("result_message").getAsString());
+            }
+            radioJson = jsonObject.get("data").getAsJsonObject().get("top").getAsJsonArray().toString();
+            List<RadioTop>list = gson.fromJson(radioJson, new TypeToken<List<RadioTop>>(){}.getType());
+            redisTemplate.opsForValue().set(String.format(RadioConstant.RADIO_TOP_FORMAT,placeId), gson.toJson(list), 30, TimeUnit.MINUTES);
+            return list;
+        }
+        return gson.fromJson(json, new TypeToken<RadioCateVO>(){}.getType());
+    }
+
+    private String getData(String url) throws IOException {
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(url)
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8")
+                .header("Accept-Encoding", "gzip, deflate")
+                .header("Accept-Language", "en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7")
+                .header("Cache-Control", "no-cache")
+                .header("Connection", "keep-alive")
+                .header("Pragma", "no-cache")
+                .header("Upgrade-Insecure-Requests", "1")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.92 Safari/537.36")
+                .build();
+        Response response = client.newCall(request).execute();
+        String radioJson = response.body().string();
+        return radioJson;
+    }
+
+}
